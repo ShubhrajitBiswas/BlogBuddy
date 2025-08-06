@@ -7,14 +7,14 @@ const BlogList = () => {
   const [menu, setMenu] = useState("All");
 
   return (
-    <div>
-      <div className="flex justify-center gap-4 sm:gap-8 my-10 relative">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-wrap justify-center gap-3 sm:gap-6 lg:gap-8 my-8 sm:my-12 relative">
         {blogCategories.map((item) => (
           <div key={item} className="relative">
             <button
               onClick={() => setMenu(item)}
-              className={`cursor-pointer text-gray-500 ${
-                menu === item ? "text-white px-4 pt-0.5" : ""
+              className={`cursor-pointer text-gray-500 text-sm sm:text-base font-medium transition-colors px-4 py-1 rounded-full relative z-10 ${
+                menu === item ? "text-white" : "hover:text-gray-700"
               }`}
             >
               {item}
@@ -22,15 +22,15 @@ const BlogList = () => {
                 <motion.div
                   layoutId="underline"
                   transition={{ type: "spring", stiffness: 200, damping: 35 }}
-                  className="absolute left-0 right-0 top-0 h-7 z-[-1] bg-primary rounded-full"
-                motion/>
+                  className="absolute inset-0 bg-primary rounded-full -z-10"
+                />
               )}
             </button>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 mb-24 mx-8 sm:mx-16 xl:mx-40">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-16 sm:mb-24">
         {blog_data
           .filter((blog) => (menu === "All" ? true : blog.category === menu))
           .map((blog) => (
