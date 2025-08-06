@@ -82,7 +82,7 @@ const Sidebar = () => {
 
             {/* Icon and label */}
             <img src={assets.comment_icon} alt="" className="min-w-4 w-5" />
-            <p className="hidden md:inline-block">Comment</p>
+            <p className="hidden md:inline-block">Comments</p>
           </>
         )}
       </NavLink>
