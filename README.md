@@ -1,3 +1,11 @@
+## 📸 Screenshots
+
+Home Page   
+
+![App Screenshot](./shot.png)
+
+---
+
 # BlogBuddy.ai 🧠✍️
 
 **BlogBuddy.ai** is an AI-powered blogging platform designed to assist writers and content creators by providing intelligent suggestions, automated formatting, comment moderation, and more. It simplifies the blogging experience using cutting-edge AI technologies.
@@ -118,15 +126,6 @@ BlogBuddy/
    npm install
    npm run dev
    ```
-
----
-
-## 📸 Screenshots
-
-Home Page   
-
-![App Screenshot](./shot.png)
-
 
 ---
 
