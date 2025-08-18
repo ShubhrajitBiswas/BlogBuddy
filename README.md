@@ -125,7 +125,8 @@ BlogBuddy/
 
 Home Page   
 
-![Screenshot 2025-06-20 124047](https://github.com/user-attachments/assets/310b3392-5740-4182-ae0c-46dfbc1601be)
+![App Screenshot](./shot.png)
+
 
 ---
 
