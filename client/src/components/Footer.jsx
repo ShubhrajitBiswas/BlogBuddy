@@ -7,10 +7,9 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-start justify-between gap-8 sm:gap-10 py-8 sm:py-12 border-b border-gray-300/30 text-gray-600">
           <div className="w-full lg:w-1/3">
-            <img src={assets.logo} alt="logo" className="w-28 sm:w-36 lg:w-44" />
-            <p className="max-w-md mt-4 sm:mt-6 text-sm sm:text-base leading-relaxed">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum unde
-              quaerat eveniet cumque accusamus atque qui error quo enim fugiat?
+            <img src={assets.picc} alt="logo" className="w-28 sm:w-36 lg:w-44 -ml-3" />
+            <p className="max-w-md mt-4 sm:mt-6 text-sm sm:text-base leading-relaxed ">
+              BlogBuddy.AI is your AI-powered companion for creating insightful, engaging, and SEO-friendly blog content in minutes. Empower your ideas with the intelligence of automation and creativity combined.
             </p>
           </div>
 
@@ -38,7 +37,7 @@ const Footer = () => {
         </div>
 
         <p className="py-4 sm:py-6 text-center text-sm sm:text-base text-gray-500">
-          Copyright © 2025 BlogBuddy. All Rights Reserved
+          Copyright © 2025 BlogBuddy.AI. All Rights Reserved
         </p>
       </div>
     </footer>
