@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { assets, dashboard_data } from "../../assets/assets";
+import { assets } from "../../assets/assets";
 import BlogTableItem from "../../components/admin/BlogTableItem"
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
@@ -13,14 +13,17 @@ const Dashboard = () => {
   });
   const {axios} = useAppContext();
  const fetchDashboard = async () => {
-         setDashboardData(dashboard_data)
-        /* try {
+        try {
             const { data } = await axios.get('/api/admin/dashboard')
-            data.success ? setDashboardData(data.dashboardData) : toast.error(data.message);
+            if (data.success) {
+                setDashboardData(data.dashboardData);
+            } else {
+                toast.error(data.message);
+            }
         } catch (error) {
-            toast.error(error.message);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch dashboard data';
+            toast.error(errorMessage);
         }
-    */
   }
 
   useEffect(() => {
@@ -90,16 +93,24 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {dashboardData.recentBlogs.map((blog, index) => {
-                return (
-                  <BlogTableItem
-                    key={blog._id}
-                    blog={blog}
-                    fetchBlogs={fetchDashboard}
-                    index={index + 1}
-                  />
-                );
-              })}
+              {dashboardData.recentBlogs && dashboardData.recentBlogs.length > 0 ? (
+                dashboardData.recentBlogs.map((blog, index) => {
+                  return (
+                    <BlogTableItem
+                      key={blog._id}
+                      blog={blog}
+                      fetchBlogs={fetchDashboard}
+                      index={index + 1}
+                    />
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                    No blogs yet. Create your first blog!
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

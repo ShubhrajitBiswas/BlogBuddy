@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { blog_data } from '../../assets/assets'
 import BlogTableItem from '../../components/admin/BlogTableItem'
 import { useAppContext } from '../../context/AppContext'
 import toast from 'react-hot-toast';
@@ -10,10 +9,7 @@ const ListBlog = () => {
   const {axios} = useAppContext();
 
 const fetchBlogs = async () => {
-
-        setBlogs(blog_data)
-        
-        /*try {
+        try {
             const { data } = await axios.get('/api/admin/blogs');
             if (data.success) {
                 setBlogs(data.blogs);
@@ -21,9 +17,9 @@ const fetchBlogs = async () => {
                 toast.error(data.message);
             }
         } catch (error) {
-            toast.error(error.message);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch blogs';
+            toast.error(errorMessage);
         }
-            */
     };
 
 
@@ -62,16 +58,24 @@ const fetchBlogs = async () => {
               </tr>
             </thead>
             <tbody>
-              {blogs.map((blog, index) => {
-                return (
-                  <BlogTableItem
-                    key={blog._id}
-                    blog={blog}
-                    fetchBlogs={fetchBlogs}
-                    index={index + 1}
-                  />
-                );
-              })}
+              {blogs.length > 0 ? (
+                blogs.map((blog, index) => {
+                  return (
+                    <BlogTableItem
+                      key={blog._id}
+                      blog={blog}
+                      fetchBlogs={fetchBlogs}
+                      index={index + 1}
+                    />
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                    No blogs found. Create your first blog!
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

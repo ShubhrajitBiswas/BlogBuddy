@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { assets, blog_data, comments_data } from "../assets/assets";
+import { assets } from "../assets/assets";
 import Navbar from "../components/Navbar";
 import Moment from "moment";
 import Footer from "../components/Footer";
@@ -15,70 +15,83 @@ const Blog = () => {
   const [comments, setComments] = useState([]);
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
 
   const fetchBlogData = async () => {
-    const blog = blog_data.find((item) => item._id === id);
-    setData(blog);
+    try {
+      const { data } = await axios.get(`/api/blog/${id}`);
+      if (data.success) {
+        setData(data.blog);
+      } else {
+        toast.error(data.message || 'Blog not found');
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load blog';
+      toast.error(errorMessage);
+      console.error('Error fetching blog:', error);
+    }
   };
 
-  {
-    /* Fetch from database
-    const fetchBlogData = async () =>{
-  try {
-    const {data} = await axios.get("/api/blog/${id}`)
-    data.success ? setData(data.blog) : toast.error(data.message)
-  } catch (error) {
-    toast.error(error.message)
-  }
-}
-*/
-  }
-
-  
-    
   const fetchComments = async () => {
-    setComments(comments_data);
-  };
-
-  
-  {/* add comments from database
-  const fetchComments = async () => {
+    setIsLoadingComments(true);
     try {
       const { data } = await axios.post("/api/blog/comments", { blogId: id });
       if (data.success) {
-        setComments(data.comments);
+        setComments(data.comments || []);
       } else {
-        toast.error(data.message);
+        setComments([]);
+        console.error('Failed to fetch comments:', data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      setComments([]);
+      console.error('Error fetching comments:', error);
+      // Only show error toast if it's not a network error (which might be temporary)
+      if (error.response?.status !== 404) {
+        // Silent fail for comments - don't disturb user experience
+      }
+    } finally {
+      setIsLoadingComments(false);
     }
   };
-*/}
   const addComment = async (e) => {
     e.preventDefault();
+    if (!name.trim() || !content.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
+    setIsSubmittingComment(true);
     try {
       const { data } = await axios.post("/api/blog/add-comment", {
         blog: id,
-        name,
-        content,
+        name: name.trim(),
+        content: content.trim(),
       });
       if (data.success) {
         toast.success(data.message);
         setName("");
         setContent("");
+        // Refresh comments after adding
+        await fetchComments();
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to add comment';
+      toast.error(errorMessage);
+      console.error('Error adding comment:', error);
+    } finally {
+      setIsSubmittingComment(false);
     }
   };
 
   useEffect(() => {
-    fetchBlogData();
-    fetchComments();
-  }, []);
+    if (id) {
+      fetchBlogData();
+      fetchComments();
+    }
+  }, [id]);
 
   return data ? (
     <div className="min-h-screen bg-white relative">
@@ -124,27 +137,37 @@ const Blog = () => {
               Comments ({comments.length})
             </p>
 
-            <div className="flex flex-col gap-4 sm:gap-6">
-              {comments.map((item, index) => (
-                <div
-                  key={index}
-                  className="relative bg-primary/5 border border-primary/10 max-w-xl p-4 sm:p-6 rounded-lg text-gray-600"
-                >
-                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                    <img src={assets.user_icon} alt="" className="w-5 sm:w-6" />
-                    <p className="font-medium text-sm sm:text-base">
-                      {item.name}
-                    </p>
-                  </div>
-                  <p className="text-xs sm:text-sm max-w-md ml-6 sm:ml-8 leading-relaxed">
-                    {item.content}
-                  </p>
-                  <div className="absolute right-3 sm:right-4 bottom-3 flex items-center gap-2 text-xs text-gray-500">
-                    {Moment(item.createdAt).fromNow()}
-                  </div>
-                </div>
-              ))}
-            </div>
+            {isLoadingComments ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4 sm:gap-6">
+                {comments.length > 0 ? (
+                  comments.map((item, index) => (
+                    <div
+                      key={index}
+                      className="relative bg-primary/5 border border-primary/10 max-w-xl p-4 sm:p-6 rounded-lg text-gray-600"
+                    >
+                      <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                        <img src={assets.user_icon} alt="" className="w-5 sm:w-6" />
+                        <p className="font-medium text-sm sm:text-base">
+                          {item.name}
+                        </p>
+                      </div>
+                      <p className="text-xs sm:text-sm max-w-md ml-6 sm:ml-8 leading-relaxed">
+                        {item.content}
+                      </p>
+                      <div className="absolute right-3 sm:right-4 bottom-3 flex items-center gap-2 text-xs text-gray-500">
+                        {Moment(item.createdAt).fromNow()}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-8">No comments yet. Be the first to comment!</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Add comment section */}
@@ -162,20 +185,30 @@ const Blog = () => {
                 type="text"
                 placeholder="Name"
                 required
-                className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg outline-none focus:border-primary transition-colors"
+                disabled={isSubmittingComment}
+                className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg outline-none focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <textarea
                 onChange={(e) => setContent(e.target.value)}
                 value={content}
                 placeholder="Comment"
-                className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg outline-none focus:border-primary transition-colors h-32 sm:h-48 resize-none"
+                disabled={isSubmittingComment}
+                className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg outline-none focus:border-primary transition-colors h-32 sm:h-48 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                 required
               />
               <button
                 type="submit"
-                className="bg-primary text-white rounded-lg p-3 sm:p-4 px-6 sm:px-8 hover:bg-primary/90 transition-colors cursor-pointer text-sm sm:text-base"
+                disabled={isSubmittingComment}
+                className="bg-primary text-white rounded-lg p-3 sm:p-4 px-6 sm:px-8 hover:bg-primary/90 transition-colors cursor-pointer text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                Submit
+                {isSubmittingComment ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit'
+                )}
               </button>
             </form>
           </div>

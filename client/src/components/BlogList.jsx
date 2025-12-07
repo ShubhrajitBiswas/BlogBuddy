@@ -1,19 +1,16 @@
 import React, { useState } from "react";
-import { blog_data, blogCategories } from "../assets/assets";
+import { blogCategories } from "../assets/assets";
 import { motion } from "framer-motion";
 import BlogCard from "./BlogCard";
 import { useAppContext } from "../context/AppContext";
 
 const BlogList = () => {
   const [menu, setMenu] = useState("All");
-  const { input } = useAppContext();
+  const { filteredBlogs: contextBlogs, input } = useAppContext();
 
-  const filteredBlogs = blog_data.filter((blog) => {
+  const filteredBlogs = contextBlogs.filter((blog) => {
     const matchesCategory = menu === "All" || blog.category === menu;
-    const matchesSearch =
-      blog.title.toLowerCase().includes(input.toLowerCase()) ||
-      blog.category.toLowerCase().includes(input.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesCategory;
   });
 
   return (

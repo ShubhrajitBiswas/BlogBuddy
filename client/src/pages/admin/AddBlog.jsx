@@ -7,7 +7,7 @@ import {parse} from 'marked';
 
 const AddBlog = () => {
 
-  const {axios} = useAppContext();
+  const {axios, fetchBlogs, navigate} = useAppContext();
   const [isAdding,setIsAdding] = useState(false);
   const [loading, setLoading] = useState(false);
   const [image, SetImage] = useState(false);
@@ -44,15 +44,25 @@ const AddBlog = () => {
 
       if (data.success) {
         toast.success(data.message);
+        // Refresh home page blogs
+        fetchBlogs();
+        // Reset form
         SetImage(false)
         SetTitle('')
+        SetsubTitle('')
+        SetisPublished(false)
         quillRef.current.root.innerHTML = ''
         SetCategory('Startup')
+        // Navigate to blog list to see the newly added blog
+        setTimeout(() => {
+          navigate('/admin/listblog');
+        }, 500);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to add blog';
+      toast.error(errorMessage);
     } finally {
       setIsAdding(false);
     }
@@ -67,10 +77,11 @@ const AddBlog = () => {
       if(data.success){
         quillRef.current.root.innerHTML = parse(data.content);
       }else{
-        toast.error(data.message);
+        toast.error(data.message || 'Failed to generate content');
       }
     } catch (error) {
-       toast.error(error.message);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to generate content. Please check your authentication and try again.';
+      toast.error(errorMessage);
     }finally{
       setLoading(false);
     }

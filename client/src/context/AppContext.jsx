@@ -34,6 +34,15 @@ export const AppProvider = ({ children }) => {
     }
   }, []);
 
+  // Sync axios header whenever token changes
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      delete axios.defaults.headers.common['Authorization'];
+    }
+  }, [token]);
+
   // 🔍 Filtered blogs based on `input`
   const filteredBlogs = blogs.filter((blog) =>
     blog.title.toLowerCase().includes(input.toLowerCase())
@@ -46,6 +55,7 @@ export const AppProvider = ({ children }) => {
     setToken,
     blogs,
     setBlogs,
+    fetchBlogs, // <-- expose fetchBlogs so it can be called after adding a blog
     input,
     setInput,
     filteredBlogs, // <-- expose this
